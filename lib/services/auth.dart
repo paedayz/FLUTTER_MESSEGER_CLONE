@@ -4,6 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:messeger_clone/helperfunctions/sharedpref_helper.dart';
 import 'package:messeger_clone/services/database.dart';
+import 'package:messeger_clone/views/home.dart';
 
 class AuthMethods {
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -45,7 +46,12 @@ class AuthMethods {
         'imgUrl': userDetails.photoURL
       };
 
-      DatabaseMethods().addUserInfoToDB(userDetails.uid, userInfoMap);
+      DatabaseMethods()
+          .addUserInfoToDB(userDetails.uid, userInfoMap)
+          .then((value) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => Home()));
+      });
     }
   }
 }
