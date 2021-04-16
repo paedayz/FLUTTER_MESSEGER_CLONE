@@ -30,7 +30,35 @@ class _HomeState extends State<Home> {
       ),
       body: Center(
         child: Container(
-          child: Text('Home Page'),
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 1.0,
+                      style: BorderStyle.solid,
+                    ),
+                    borderRadius: BorderRadius.circular(24)),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: 'username',
+                        ),
+                      ),
+                    ),
+                    Icon(Icons.search)
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
