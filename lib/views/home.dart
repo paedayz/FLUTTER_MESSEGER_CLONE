@@ -8,6 +8,10 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  bool isSearching = false;
+
+  TextEditingController searchUsernameEditingController =
+      TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,29 +37,57 @@ class _HomeState extends State<Home> {
           margin: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 16),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 1.0,
-                      style: BorderStyle.solid,
-                    ),
-                    borderRadius: BorderRadius.circular(24)),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText: 'username',
-                        ),
+              Row(
+                children: [
+                  isSearching
+                      ? GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isSearching = false;
+                              searchUsernameEditingController.text = '';
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Icon(Icons.arrow_back),
+                          ),
+                        )
+                      : Container(),
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 1.0,
+                            style: BorderStyle.solid,
+                          ),
+                          borderRadius: BorderRadius.circular(24)),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: searchUsernameEditingController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                hintText: 'username',
+                              ),
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isSearching = true;
+                              });
+                            },
+                            child: Icon(Icons.search),
+                          )
+                        ],
                       ),
                     ),
-                    Icon(Icons.search)
-                  ],
-                ),
+                  ),
+                ],
               )
             ],
           ),
