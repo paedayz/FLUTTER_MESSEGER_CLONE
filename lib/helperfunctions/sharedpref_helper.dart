@@ -7,7 +7,7 @@ class SharedPreferenceHelper {
   static String userEmailKey = 'USEREMAILKEY';
   static String userProfilePicKey = 'USERPROFILEPICKEY';
 
-  //save data
+  //save data to local device
   Future<bool> saveUserName(String getUserName) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setString(userNameKey, getUserName);
