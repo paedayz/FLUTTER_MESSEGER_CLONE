@@ -5,12 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:messeger_clone/helperfunctions/sharedpref_helper.dart';
 import 'package:messeger_clone/services/database.dart';
 import 'package:messeger_clone/views/home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthMethods {
   final FirebaseAuth auth = FirebaseAuth.instance;
 
-  getCurrentUser() {
-    return auth.currentUser;
+  getCurrentUser() async {
+    return await auth.currentUser;
   }
 
   signInWithGoogle(BuildContext context) async {
@@ -53,5 +54,11 @@ class AuthMethods {
             context, MaterialPageRoute(builder: (context) => Home()));
       });
     }
+  }
+
+  Future signOut() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+    await auth.signOut();
   }
 }
