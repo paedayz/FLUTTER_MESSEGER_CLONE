@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:messeger_clone/helperfunctions/sharedpref_helper.dart';
+import 'package:messeger_clone/services/database.dart';
 
 class AuthMethods {
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -36,6 +37,15 @@ class AuthMethods {
       SharedPreferenceHelper().saveUserId(userDetails.uid);
       SharedPreferenceHelper().saveUserDisplayName(userDetails.displayName);
       SharedPreferenceHelper().saveUserProfileUrl(userDetails.photoURL);
+
+      Map<String, dynamic> userInfoMap = {
+        'email': userDetails.email,
+        'username': userDetails.email.replaceAll("@gmail.com", ""),
+        'name': userDetails.displayName,
+        'imgUrl': userDetails.photoURL
+      };
+
+      DatabaseMethods().addUserInfoToDB(userDetails.uid, userInfoMap);
     }
   }
 }
