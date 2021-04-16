@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:messeger_clone/services/auth.dart';
 import 'package:messeger_clone/services/database.dart';
+import 'package:messeger_clone/views/chatscreen.dart';
 import 'package:messeger_clone/views/signin.dart';
 
 class Home extends StatefulWidget {
@@ -36,7 +37,10 @@ class _HomeState extends State<Home> {
                 itemBuilder: (context, index) {
                   DocumentSnapshot ds = snapshot.data.docs[index];
                   return searchListUserTile(
-                      ds['imgUrl'], ds['username'], ds['email']);
+                      profileUrl: ds['imgUrl'],
+                      name: ds['name'],
+                      email: ds['email'],
+                      username: ds['username']);
                 },
               )
             : Center(
@@ -51,15 +55,33 @@ class _HomeState extends State<Home> {
     return Container();
   }
 
-  Widget searchListUserTile(String profileUrl, name, email) {
-    return Row(
-      children: [
-        Image.network(
-          profileUrl,
-          height: 30,
-          width: 30,
-        )
-      ],
+  Widget searchListUserTile({String profileUrl, name, email, username}) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ChatScreen(username, name)));
+      },
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: Image.network(
+              profileUrl,
+              height: 40,
+              width: 40,
+            ),
+          ),
+          SizedBox(
+            width: 12,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [Text(name), Text(email)],
+          )
+        ],
+      ),
     );
   }
 
