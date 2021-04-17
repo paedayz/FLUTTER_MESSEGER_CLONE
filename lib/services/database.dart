@@ -69,7 +69,6 @@ class DatabaseMethods {
   }
 
   Future<QuerySnapshot> getUserInfo(String username) async {
-    print('wtfffffffff $username');
     return await FirebaseFirestore.instance
         .collection('users')
         .where('username', isEqualTo: username)

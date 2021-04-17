@@ -34,6 +34,7 @@ dependencies:
   random_string:
   cloud_firestore:
   cupertino_icons: ^1.0.2
+  timeago: ^3.0.2
 
 dev_dependencies:
   flutter_test:

@@ -5,6 +5,7 @@ import 'package:messeger_clone/services/auth.dart';
 import 'package:messeger_clone/services/database.dart';
 import 'package:messeger_clone/views/chatscreen.dart';
 import 'package:messeger_clone/views/signin.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class Home extends StatefulWidget {
   @override
@@ -25,16 +26,10 @@ class _HomeState extends State<Home> {
     myProfilePic = await SharedPreferenceHelper().getUserProfileUrl();
     myUserName = await SharedPreferenceHelper().getUserName();
     myEmail = await SharedPreferenceHelper().getUserEmail();
-    print(myUserName);
-    print(myEmail);
-    print('555555555555555555555');
     setState(() {});
   }
 
   getChatRoomIdByUsernames(String a, String b) {
-    print(a);
-    print(b);
-    print('kkkkkkkkkkkkkk');
     if (a.substring(0, 1).codeUnitAt(0) + a.length >
         b.substring(0, 1).codeUnitAt(0) + b.length) {
       return '$b\_$a';
@@ -62,10 +57,8 @@ class _HomeState extends State<Home> {
                   itemCount: snapshot.data.docs.length,
                   itemBuilder: (context, index) {
                     DocumentSnapshot ds = snapshot.data.docs[index];
-                    print(ds.id);
-                    print('ooooooooooooooooooooooooo');
-                    return ChatRoomListTile(
-                        ds['lastMessage'], ds.id, myUserName);
+                    return ChatRoomListTile(ds['lastMessage'], ds.id,
+                        myUserName, ds['lastMessageSendTs']);
                   },
                 )
               : Center(child: CircularProgressIndicator());
@@ -137,8 +130,6 @@ class _HomeState extends State<Home> {
 
   getChatRooms() async {
     chatRoomStream = await DatabaseMethods().getChatRooms();
-    print(chatRoomStream);
-    print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
     setState(() {});
   }
 
@@ -241,7 +232,9 @@ class _HomeState extends State<Home> {
 
 class ChatRoomListTile extends StatefulWidget {
   final String lastMessage, chatRoomId, myUsername;
-  ChatRoomListTile(this.lastMessage, this.chatRoomId, this.myUsername);
+  final Timestamp lastMessageSendTs;
+  ChatRoomListTile(this.lastMessage, this.chatRoomId, this.myUsername,
+      this.lastMessageSendTs);
 
   @override
   _ChatRoomListTileState createState() => _ChatRoomListTileState();
@@ -251,11 +244,9 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
   String profilePicUrl, name, username;
 
   getThisUserInfo() async {
-    print('xxxxxxxxxxxxx $username');
     username =
         widget.chatRoomId.replaceAll(widget.myUsername, '').replaceAll('_', '');
     QuerySnapshot querySnapshot = await DatabaseMethods().getUserInfo(username);
-    print('something ${querySnapshot.docs[0].id}');
     name = querySnapshot.docs[0]['name'];
     profilePicUrl = querySnapshot.docs[0]['imgUrl'];
     setState(() {});
@@ -291,10 +282,32 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
           SizedBox(
             width: 20,
           ),
-          Column(
+          Row(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [Text(username), Text(widget.lastMessage)],
-          )
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(username),
+                  Text(
+                    widget.lastMessage,
+                    style: TextStyle(
+                      color: Colors.black45,
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(
+                width: 160,
+              ),
+              Text(
+                '${timeago.format(DateTime.fromMillisecondsSinceEpoch(widget.lastMessageSendTs.millisecondsSinceEpoch))}',
+                style: TextStyle(
+                  color: Colors.black38,
+                ),
+              )
+            ],
+          ),
         ],
       ),
     );
