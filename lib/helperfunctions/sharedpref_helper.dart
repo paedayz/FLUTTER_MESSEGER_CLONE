@@ -9,6 +9,8 @@ class SharedPreferenceHelper {
 
   //save data to local device
   Future<bool> saveUserName(String getUserName) async {
+    print(getUserName);
+    print('TTTTTTTTTTTTTTTTTTTTTTT');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.setString(userNameKey, getUserName);
   }

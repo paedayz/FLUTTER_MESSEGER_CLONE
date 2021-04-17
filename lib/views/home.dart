@@ -14,7 +14,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   bool isSearching = false;
 
-  Stream userStream;
+  Stream userStream, chatRoomStream;
   String myName, myProfilePic, myUserName, myEmail;
 
   TextEditingController searchUsernameEditingController =
@@ -26,10 +26,15 @@ class _HomeState extends State<Home> {
     myUserName = await SharedPreferenceHelper().getUserName();
     myEmail = await SharedPreferenceHelper().getUserEmail();
     print(myUserName);
+    print(myEmail);
+    print('555555555555555555555');
     setState(() {});
   }
 
   getChatRoomIdByUsernames(String a, String b) {
+    print(a);
+    print(b);
+    print('kkkkkkkkkkkkkk');
     if (a.substring(0, 1).codeUnitAt(0) + a.length >
         b.substring(0, 1).codeUnitAt(0) + b.length) {
       return '$b\_$a';
@@ -45,6 +50,26 @@ class _HomeState extends State<Home> {
     userStream = await DatabaseMethods()
         .getUserByUsername(searchUsernameEditingController.text);
     setState(() {});
+  }
+
+  Widget chatRoomsList() {
+    return StreamBuilder(
+        stream: chatRoomStream,
+        builder: (context, snapshot) {
+          return snapshot.hasData
+              ? ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: snapshot.data.docs.length,
+                  itemBuilder: (context, index) {
+                    DocumentSnapshot ds = snapshot.data.docs[index];
+                    print(ds.id);
+                    print('ooooooooooooooooooooooooo');
+                    return Text(
+                        ds.id.replaceAll(myUserName, "").replaceAll('_', ''));
+                  },
+                )
+              : Center(child: CircularProgressIndicator());
+        });
   }
 
   Widget searchUsersList() {
@@ -69,10 +94,6 @@ class _HomeState extends State<Home> {
       },
       stream: userStream,
     );
-  }
-
-  Widget chatRoomList() {
-    return Container();
   }
 
   Widget searchListUserTile({String profileUrl, name, email, username}) {
@@ -114,9 +135,21 @@ class _HomeState extends State<Home> {
     );
   }
 
+  getChatRooms() async {
+    chatRoomStream = await DatabaseMethods().getChatRooms();
+    print(chatRoomStream);
+    print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+    setState(() {});
+  }
+
+  onScreenLoaded() async {
+    await getMyInfoFromSharedPreference();
+    getChatRooms();
+  }
+
   @override
   void initState() {
-    getMyInfoFromSharedPreference();
+    onScreenLoaded();
     super.initState();
   }
 
@@ -197,7 +230,7 @@ class _HomeState extends State<Home> {
                   ),
                 ],
               ),
-              isSearching ? searchUsersList() : chatRoomList()
+              isSearching ? searchUsersList() : chatRoomsList()
             ],
           ),
         ),
