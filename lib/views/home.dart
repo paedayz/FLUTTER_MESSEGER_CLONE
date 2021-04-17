@@ -25,10 +25,13 @@ class _HomeState extends State<Home> {
     myProfilePic = await SharedPreferenceHelper().getUserProfileUrl();
     myUserName = await SharedPreferenceHelper().getUserName();
     myEmail = await SharedPreferenceHelper().getUserEmail();
+    print(myUserName);
+    setState(() {});
   }
 
   getChatRoomIdByUsernames(String a, String b) {
-    if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
+    if (a.substring(0, 1).codeUnitAt(0) + a.length >
+        b.substring(0, 1).codeUnitAt(0) + b.length) {
       return '$b\_$a';
     } else {
       return '$a\_$b';

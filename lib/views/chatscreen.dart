@@ -26,7 +26,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   getChatRoomIdByUsernames(String a, String b) {
-    if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
+    if (a.substring(0, 1).codeUnitAt(0) + a.length >
+        b.substring(0, 1).codeUnitAt(0) + b.length) {
       return '$b\_$a';
     } else {
       return '$a\_$b';
@@ -103,6 +104,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     Expanded(
                       child: TextField(
                         controller: messageTextEdittingController,
+                        onChanged: (value) => addMessage(false),
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: 'Type a message',
@@ -112,7 +114,10 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                       ),
                     ),
-                    Icon(Icons.send),
+                    GestureDetector(
+                      onTap: () => addMessage(true),
+                      child: Icon(Icons.send),
+                    ),
                   ],
                 ),
               ),
