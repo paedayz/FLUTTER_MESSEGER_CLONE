@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:messeger_clone/helperfunctions/sharedpref_helper.dart';
 import 'package:messeger_clone/services/database.dart';
@@ -13,6 +14,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   String chatRoomId, messageId = '';
+  Stream messageStream;
   String myName, myProfilePic, myUserName, myEmail;
   TextEditingController messageTextEdittingController = TextEditingController();
 
@@ -71,7 +73,27 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  getAndSetMessages() async {}
+  Widget chatMessages() {
+    return StreamBuilder(
+      stream: messageStream,
+      builder: (context, snapshot) {
+        return snapshot.hasData
+            ? ListView.builder(
+                itemCount: snapshot.data.docs.length,
+                itemBuilder: (context, index) {
+                  DocumentSnapshot ds = snapshot.data.docs[index];
+                  return Text(ds['message']);
+                },
+              )
+            : Center(child: CircularProgressIndicator());
+      },
+    );
+  }
+
+  getAndSetMessages() async {
+    messageStream = await DatabaseMethods().getChatRoomMessages(chatRoomId);
+    setState(() {});
+  }
 
   doThisOnLaunch() async {
     await getMyInfoFromSharedPreference();
@@ -81,6 +103,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     doThisOnLaunch();
+    getAndSetMessages();
     super.initState();
   }
 
@@ -93,6 +116,7 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Container(
         child: Stack(
           children: [
+            chatMessages(),
             Container(
               alignment: Alignment.bottomCenter,
               child: Container(
