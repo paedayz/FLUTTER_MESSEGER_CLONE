@@ -64,8 +64,8 @@ class _HomeState extends State<Home> {
                     DocumentSnapshot ds = snapshot.data.docs[index];
                     print(ds.id);
                     print('ooooooooooooooooooooooooo');
-                    return Text(
-                        ds.id.replaceAll(myUserName, "").replaceAll('_', ''));
+                    return ChatRoomListTile(
+                        ds['lastMessage'], ds.id, myUserName);
                   },
                 )
               : Center(child: CircularProgressIndicator());
@@ -234,6 +234,68 @@ class _HomeState extends State<Home> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class ChatRoomListTile extends StatefulWidget {
+  final String lastMessage, chatRoomId, myUsername;
+  ChatRoomListTile(this.lastMessage, this.chatRoomId, this.myUsername);
+
+  @override
+  _ChatRoomListTileState createState() => _ChatRoomListTileState();
+}
+
+class _ChatRoomListTileState extends State<ChatRoomListTile> {
+  String profilePicUrl, name, username;
+
+  getThisUserInfo() async {
+    print('xxxxxxxxxxxxx $username');
+    username =
+        widget.chatRoomId.replaceAll(widget.myUsername, '').replaceAll('_', '');
+    QuerySnapshot querySnapshot = await DatabaseMethods().getUserInfo(username);
+    print('something ${querySnapshot.docs[0].id}');
+    name = querySnapshot.docs[0]['name'];
+    profilePicUrl = querySnapshot.docs[0]['imgUrl'];
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    getThisUserInfo();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatScreen(username, name),
+          ),
+        );
+      },
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: Image.network(
+              profilePicUrl,
+              height: 30,
+              width: 30,
+            ),
+          ),
+          SizedBox(
+            width: 20,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [Text(username), Text(widget.lastMessage)],
+          )
+        ],
       ),
     );
   }
