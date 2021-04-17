@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:messeger_clone/helperfunctions/sharedpref_helper.dart';
+import 'package:messeger_clone/services/database.dart';
+import 'package:random_string/random_string.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatWithUsername, name;
@@ -12,6 +14,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   String chatRoomId, messageId = '';
   String myName, myProfilePic, myUserName, myEmail;
+  TextEditingController messageTextEdittingController = TextEditingController();
 
   getMyInfoFromSharedPreference() async {
     myName = await SharedPreferenceHelper().getUserDisplayName();
@@ -27,6 +30,43 @@ class _ChatScreenState extends State<ChatScreen> {
       return '$b\_$a';
     } else {
       return '$a\_$b';
+    }
+  }
+
+  addMessage(bool sendClicked) {
+    if (messageTextEdittingController.text != '') {
+      String message = messageTextEdittingController.text;
+
+      var lastMessageTs = DateTime.now();
+
+      Map<String, dynamic> messageInfoMap = {
+        'message': message,
+        'sendBy': myUserName,
+        'ts': lastMessageTs,
+        'imgUrl': myProfilePic
+      };
+
+      //messageId
+      if (messageId == '') {
+        messageId = randomAlphaNumeric(12);
+      }
+
+      DatabaseMethods()
+          .addMessage(chatRoomId, messageId, messageInfoMap)
+          .then((val) {
+        Map<String, dynamic> lastMessageInfoMap = {
+          'lastMessage': message,
+          'lastMessageSendTs': lastMessageTs,
+          'lastMessageSendBy': myUserName
+        };
+
+        DatabaseMethods().updateLastMessageSend(chatRoomId, lastMessageInfoMap);
+
+        if (sendClicked) {
+          messageTextEdittingController.text = '';
+          messageId = '';
+        }
+      });
     }
   }
 
@@ -62,6 +102,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   children: [
                     Expanded(
                       child: TextField(
+                        controller: messageTextEdittingController,
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           hintText: 'Type a message',

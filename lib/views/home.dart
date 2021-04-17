@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:messeger_clone/helperfunctions/sharedpref_helper.dart';
 import 'package:messeger_clone/services/auth.dart';
 import 'package:messeger_clone/services/database.dart';
 import 'package:messeger_clone/views/chatscreen.dart';
@@ -14,9 +15,25 @@ class _HomeState extends State<Home> {
   bool isSearching = false;
 
   Stream userStream;
+  String myName, myProfilePic, myUserName, myEmail;
 
   TextEditingController searchUsernameEditingController =
       TextEditingController();
+
+  getMyInfoFromSharedPreference() async {
+    myName = await SharedPreferenceHelper().getUserDisplayName();
+    myProfilePic = await SharedPreferenceHelper().getUserProfileUrl();
+    myUserName = await SharedPreferenceHelper().getUserName();
+    myEmail = await SharedPreferenceHelper().getUserEmail();
+  }
+
+  getChatRoomIdByUsernames(String a, String b) {
+    if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
+      return '$b\_$a';
+    } else {
+      return '$a\_$b';
+    }
+  }
 
   onSearchButtonClick() async {
     setState(() {
@@ -58,10 +75,19 @@ class _HomeState extends State<Home> {
   Widget searchListUserTile({String profileUrl, name, email, username}) {
     return GestureDetector(
       onTap: () {
+        var chatRoomId = getChatRoomIdByUsernames(myUserName, username);
+        Map<String, dynamic> chatRoomInfoMap = {
+          'users': [myUserName, username]
+        };
+
+        DatabaseMethods().createChatRoom(chatRoomId, chatRoomInfoMap);
+
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ChatScreen(username, name)));
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatScreen(username, name),
+          ),
+        );
       },
       child: Row(
         children: [
@@ -83,6 +109,12 @@ class _HomeState extends State<Home> {
         ],
       ),
     );
+  }
+
+  @override
+  void initState() {
+    getMyInfoFromSharedPreference();
+    super.initState();
   }
 
   @override
