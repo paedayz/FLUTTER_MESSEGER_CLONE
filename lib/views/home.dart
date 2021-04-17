@@ -298,7 +298,7 @@ class _ChatRoomListTileState extends State<ChatRoomListTile> {
                 ],
               ),
               SizedBox(
-                width: 160,
+                width: 140,
               ),
               Text(
                 '${timeago.format(DateTime.fromMillisecondsSinceEpoch(widget.lastMessageSendTs.millisecondsSinceEpoch))}',
