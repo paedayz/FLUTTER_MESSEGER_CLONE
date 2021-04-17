@@ -73,16 +73,45 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  Widget chatMessageTile(String message, bool sendByMe) {
+    return Row(
+      mainAxisAlignment:
+          sendByMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+      children: [
+        Container(
+          child: Text(
+            message,
+            style: TextStyle(color: Colors.white),
+          ),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+              bottomLeft: sendByMe ? Radius.circular(24) : Radius.circular(0),
+              bottomRight: sendByMe ? Radius.circular(0) : Radius.circular(24),
+            ),
+            color: Colors.blue[300],
+          ),
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        ),
+      ],
+    );
+  }
+
   Widget chatMessages() {
     return StreamBuilder(
       stream: messageStream,
       builder: (context, snapshot) {
         return snapshot.hasData
             ? ListView.builder(
+                reverse: true,
+                padding: const EdgeInsets.only(bottom: 70, top: 16),
                 itemCount: snapshot.data.docs.length,
                 itemBuilder: (context, index) {
                   DocumentSnapshot ds = snapshot.data.docs[index];
-                  return Text(ds['message']);
+                  return chatMessageTile(
+                      ds['message'], myUserName == ds['sendBy']);
                 },
               )
             : Center(child: CircularProgressIndicator());
@@ -103,7 +132,6 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     doThisOnLaunch();
-    getAndSetMessages();
     super.initState();
   }
 
